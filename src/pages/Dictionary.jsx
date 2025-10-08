@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 
 const sampleData = [
-  { id: 1, word: "Hello", meaning: "Xin chào", video: "/videos/hello.mp4" },
-  { id: 2, word: "Thank you", meaning: "Cảm ơn", video: "/videos/thankyou.mp4" },
-  { id: 3, word: "Love", meaning: "Yêu thương", video: "/videos/love.mp4" },
-  { id: 4, word: "Friend", meaning: "Bạn bè", video: "/videos/friend.mp4" },
+  { id: 1, word: "Hello", meaning: "Xin chào", media: "https://i.pinimg.com/originals/9e/36/92/9e369214c2c804cd74057866789d2294.gif" },
+  { id: 2, word: "Thank you", meaning: "Cảm ơn", media: "https://i.pinimg.com/originals/6a/dc/6a/6adc6a4018d5e1b69e7553ee704adb41.gif" },
+  { id: 3, word: "Love", meaning: "Yêu thương", media: "https://media1.tenor.com/m/m_TCpdLCuSoAAAAd/i-love-you-sign-language.gif" },
+  { id: 4, word: "Friend", meaning: "Bạn bè", media: "https://i.pinimg.com/originals/96/54/8f/96548fbbbb206c39da095850f0196b11.gif" },
 ];
 
 const Dictionary = () => {
@@ -49,12 +49,20 @@ const Dictionary = () => {
               </h2>
               <p className="text-gray-700 mb-3">{item.meaning}</p>
 
-              {/* Video demo */}
-              <video
-                src={item.video}
-                controls
-                className="w-full h-40 rounded-md object-cover"
-              ></video>
+              {/* Hiển thị GIF hoặc video dựa vào đuôi file */}
+              {item.media.endsWith(".gif") ? (
+                <img
+                  src={item.media}
+                  alt={item.word}
+                  className="w-full h-40 rounded-md object-cover"
+                />
+              ) : (
+                <video
+                  src={item.media}
+                  controls
+                  className="w-full h-40 rounded-md object-cover"
+                ></video>
+              )}
             </div>
           ))
         ) : (
