@@ -1,25 +1,30 @@
-import { useState } from 'react'
-import Navbar from './component/Navbar';
-import Analytics from './component/Analytics';
-import Cards from './component/Cards';
-import Footer from './component/Footer';
-import Hero from './component/Hero';
-import Newsletter from './component/Newsletter';
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Navbar from './component/Navbar'
+import Hero from './component/Hero'
+import Analytics from './component/Analytics'
+import Newsletter from './component/Newsletter'
+import Cards from './component/Cards'
+import Footer from './component/Footer'
+import Dictionary from './pages/Dictionary'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <div>
+    <Router>
       <Navbar />
-      <Hero />
-      <Analytics />
-      <Newsletter />
-      <Cards />
-      <Footer />
-    </div>
-)
+      <Routes>
+        <Route path="/" element={
+          <>
+            <Hero />
+            <Analytics />
+            <Newsletter />
+            <Cards />
+            <Footer />
+          </>
+        } />
+        <Route path="/dictionary" element={<Dictionary />} />
+      </Routes>
+    </Router>
+  )
 }
 
 export default App
