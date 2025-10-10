@@ -14,9 +14,13 @@ export default function LoginPage({ onLogin }) {
         email,
         password,
       });
+
+      console.log("✅ Server response:", res.data);
       localStorage.setItem("token", res.data.token);
-      onLogin(res.data.user);
+      onLogin(res.data.user); // cập nhật user
+      navigate("/admin/dashboard"); // điều hướng
     } catch (err) {
+      console.error("❌ Lỗi login:", err);
       alert(err.response?.data?.message || "Lỗi đăng nhập");
     }
   };

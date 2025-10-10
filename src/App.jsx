@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useState } from "react"; // 👈 THÊM DÒNG NÀY
 import LoginPage from "./admin/LoginPage";
 import RegisterPage from "./admin/RegisterPage";
 import DashboardPage from "./admin/DashboardPage";
@@ -26,6 +27,9 @@ function LayoutWithNavbar() {
 }
 
 function App() {
+  // 👇 THÊM DÒNG NÀY ĐỂ LƯU USER LOGIN
+  const [user, setUser] = useState(null);
+
   return (
     <Router>
       <Routes>
@@ -36,9 +40,21 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* 👇 Trang admin */}
-        <Route path="/admin/login" element={<LoginPage />} />
+        <Route
+          path="/admin/login"
+          element={<LoginPage onLogin={(u) => setUser(u)} />} // ✅ Truyền hàm login
+        />
         <Route path="/admin/register" element={<RegisterPage />} />
-        <Route path="/admin/dashboard" element={<DashboardPage />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            user ? (
+              <DashboardPage user={user} />
+            ) : (
+              <Navigate to="/admin/login" replace />
+            )
+          }
+        />
       </Routes>
     </Router>
   );
