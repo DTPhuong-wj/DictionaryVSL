@@ -8,14 +8,15 @@ export const sequelize = new Sequelize(
   process.env.DB_PASS,
   {
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3306,
     dialect: "mysql",
-    logging: false, 
+    logging: false,
   }
 );
 
 try {
   await sequelize.authenticate();
-  console.log("Kết nối MySQL thành công!");
+  console.log("✅ Đã kết nối MySQL thành công!");
 } catch (error) {
-  console.error("Kết nối thất bại:", error);
+  console.error("❌ Không thể kết nối DB:", error);
 }

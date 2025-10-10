@@ -1,11 +1,14 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './component/Navbar';
-import Hero from './component/Hero';
-import Analytics from './component/Analytics';
-import Newsletter from './component/Newsletter';
-import Cards from './component/Cards';
-import Footer from './component/Footer';
-import Dictionary from './pages/Dictionary';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LoginPage from "./admin/LoginPage";
+import RegisterPage from "./admin/RegisterPage";
+import DashboardPage from "./admin/DashboardPage";
+import Navbar from "./component/Navbar";
+import Hero from "./component/Hero";
+import Analytics from "./component/Analytics";
+import Newsletter from "./component/Newsletter";
+import Cards from "./component/Cards";
+import Footer from "./component/Footer";
+import Dictionary from "./pages/Dictionary";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
@@ -25,27 +28,19 @@ function LayoutWithNavbar() {
 function App() {
   return (
     <Router>
-      <MainRoutes />
-    </Router>
-  );
-}
-
-function MainRoutes() {
-  const location = useLocation();
-  
-  // ✅ Ẩn Navbar ở các trang login / register
-  const hideNavbar = location.pathname === "/login" || location.pathname === "/register";
-
-  return (
-    <>
-      {!hideNavbar && <Navbar />}
       <Routes>
+        {/* 👇 Trang user */}
         <Route path="/" element={<LayoutWithNavbar />} />
         <Route path="/dictionary" element={<Dictionary />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* 👇 Trang admin */}
+        <Route path="/admin/login" element={<LoginPage />} />
+        <Route path="/admin/register" element={<RegisterPage />} />
+        <Route path="/admin/dashboard" element={<DashboardPage />} />
       </Routes>
-    </>
+    </Router>
   );
 }
 
