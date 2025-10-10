@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 
-const Navbar = () => {
+const Navbar = ({ user, onLogout }) => {
   const [nav, setNav] = useState(false);
+  const navigate = useNavigate();
 
   const handleNav = () => setNav(!nav);
+
+  const handleLogout = () => {
+    onLogout();
+    navigate("/login");
+  };
 
   return (
     <div className="flex items-center h-10 max-w-[1240px] mx-auto px-4 text-white relative">
@@ -26,16 +32,27 @@ const Navbar = () => {
         <li className="p-4 hover:text-[#00df9a] transition">
           <Link to="/about">About</Link>
         </li>
-        <li className="p-4 hover:text-[#00df9a] transition">
-          <Link to="/login">Login</Link>
-        </li>
+
+        {/* Nếu user chưa login */}
+        {!user && (
+          <li className="p-4 hover:text-[#00df9a] transition">
+            <Link to="/login">Login</Link>
+          </li>
+        )}
+
+        {/* Nếu user đã login */}
+        {user && (
+          <>
+            <li className="p-4 hover:text-[#00df9a] transition cursor-pointer" onClick={handleLogout}>
+              Logout
+            </li>
+            <li className="p-4 text-[#00df9a] font-semibold">{user.name}</li>
+          </>
+        )}
       </ul>
 
       {/* Icon mobile menu */}
-      <div
-        onClick={handleNav}
-        className="block md:hidden cursor-pointer ml-auto z-20"
-      >
+      <div onClick={handleNav} className="block md:hidden cursor-pointer ml-auto z-20">
         {nav ? <AiOutlineClose size={25} /> : <AiOutlineMenu size={25} />}
       </div>
 
@@ -58,9 +75,21 @@ const Navbar = () => {
         <li className="p-4 border-b border-gray-600">
           <Link to="/about" onClick={handleNav}>About</Link>
         </li>
-        <li className="p-4">
-          <Link to="/login" onClick={handleNav}>Login</Link>
-        </li>
+
+        {!user && (
+          <li className="p-4" onClick={handleNav}>
+            <Link to="/login">Login</Link>
+          </li>
+        )}
+
+        {user && (
+          <>
+            <li className="p-4 cursor-pointer" onClick={() => { handleLogout(); handleNav(); }}>
+              Logout
+            </li>
+            <li className="p-4 text-[#00df9a] font-semibold">{user.name}</li>
+          </>
+        )}
       </ul>
     </div>
   );

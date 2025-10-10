@@ -1,71 +1,89 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const Register = () => {
-  const [username, setUsername] = useState("");
+export default function Register() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [confirm, setConfirm] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    setMessage("");
+
+    if (password !== confirm) {
+      alert("Mật khẩu xác nhận không khớp!");
+      return;
+    }
 
     try {
-      const res = await fetch("http://localhost:8080/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+      await axios.post("http://localhost:8080/api/auth/register", {
+        name,
+        email,
+        password,
+        role: "user", // mặc định role user
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-      setMessage("✅ Registration successful!");
-      setTimeout(() => navigate("/login"), 1200);
+      alert("Đăng ký thành công! Hãy đăng nhập.");
+      navigate("/login");
     } catch (err) {
-      setMessage(`❌ ${err.message}`);
+      console.error(err);
+      alert(err.response?.data?.message || "Lỗi khi đăng ký tài khoản");
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-[#2c5364] via-[#203a43] to-[#0f2027]">
-      <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-lg w-[350px] text-white">
-        <h2 className="text-3xl font-bold text-center mb-6 text-[#00df9a]">Create Account ✨</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="p-3 rounded-md bg-white/20 focus:outline-none focus:ring-2 focus:ring-[#00df9a]"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="p-3 rounded-md bg-white/20 focus:outline-none focus:ring-2 focus:ring-[#00df9a]"
-          />
-          <button
-            type="submit"
-            className="bg-[#00df9a] text-black font-semibold py-2 rounded-md hover:bg-[#00c78a] transition"
-          >
-            Register
-          </button>
-          {message && <p className="text-center text-sm mt-2">{message}</p>}
-        </form>
-        <p className="text-sm text-center mt-4">
-          Already have an account?{" "}
+    <div className="flex items-center justify-center h-screen bg-gray-100">
+      <form className="bg-white p-8 rounded-xl shadow-md w-[350px]" onSubmit={handleRegister}>
+        <h1 className="text-2xl font-bold mb-4 text-center">Đăng ký</h1>
+
+        <input
+          type="text"
+          placeholder="Tên hiển thị"
+          className="border p-2 w-full mb-3 rounded"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <input
+          type="email"
+          placeholder="Email"
+          className="border p-2 w-full mb-3 rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Mật khẩu"
+          className="border p-2 w-full mb-3 rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <input
+          type="password"
+          placeholder="Xác nhận mật khẩu"
+          className="border p-2 w-full mb-4 rounded"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+        />
+
+        <button className="bg-green-500 text-white w-full py-2 rounded hover:bg-green-600">
+          Đăng ký
+        </button>
+
+        <p className="text-center text-sm mt-4">
+          Đã có tài khoản?{" "}
           <span
             onClick={() => navigate("/login")}
-            className="text-[#00df9a] hover:underline cursor-pointer"
+            className="text-blue-500 hover:underline cursor-pointer"
           >
-            Login
+            Đăng nhập
           </span>
         </p>
-      </div>
+      </form>
     </div>
   );
-};
-
-export default Register;
+}
