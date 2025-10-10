@@ -1,29 +1,104 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
-const sampleData = [
-  { id: 1, word: "Hello", meaning: "Xin chào", media: "https://i.pinimg.com/originals/9e/36/92/9e369214c2c804cd74057866789d2294.gif" },
-  { id: 2, word: "Thank you", meaning: "Cảm ơn", media: "https://i.pinimg.com/originals/6a/dc/6a/6adc6a4018d5e1b69e7553ee704adb41.gif" },
-  { id: 3, word: "Love", meaning: "Yêu thương", media: "https://media1.tenor.com/m/m_TCpdLCuSoAAAAd/i-love-you-sign-language.gif" },
-  { id: 4, word: "Friend", meaning: "Bạn bè", media: "https://i.pinimg.com/originals/96/54/8f/96548fbbbb206c39da095850f0196b11.gif" },
-];
-
-const Dictionary = () => {
+const Dictionary = ({ user }) => {
+  const [words, setWords] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [selectedWord, setSelectedWord] = useState(null);
+  const [history, setHistory] = useState([]);
 
-  // Lọc từ theo ô tìm kiếm
-  const filteredWords = sampleData.filter((item) =>
+  // Lấy từ vựng
+  useEffect(() => {
+    const fetchWords = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/api/words");
+        setWords(res.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Lỗi khi fetch từ vựng:", err);
+        setLoading(false);
+      }
+    };
+    fetchWords();
+  }, []);
+
+  // Lấy lịch sử tìm kiếm nếu user đã đăng nhập
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchHistory = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8080/api/search-history?userID=${user.userID}`
+        );
+        setHistory(res.data);
+      } catch (err) {
+        console.error("Lỗi khi fetch lịch sử:", err);
+      }
+    };
+
+    fetchHistory();
+  }, [user]);
+
+  const filteredWords = words.filter((item) =>
     item.word.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handleReport = async (wordID) => {
+    if (!user) {
+      alert("Bạn cần đăng nhập để gửi report!");
+      return;
+    }
+
+    const message = prompt("Bạn muốn góp ý gì về từ này?");
+    if (!message) return;
+
+    try {
+      await axios.post("http://localhost:8080/api/reports", {
+        wordID,
+        userID: user.userID,
+        message,
+      });
+      alert("Report đã gửi thành công!");
+    } catch (err) {
+      console.error(err);
+      alert("Gửi report thất bại!");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center text-gray-500">
+        Đang tải từ vựng...
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-50 py-10 px-4">
       {/* Header */}
-      <div className="max-w-[1000px] mx-auto text-center mb-10">
+      <div className="max-w-[1000px] mx-auto text-center mb-6">
         <h1 className="text-4xl font-bold text-[#00df9a] mb-3">Dictionary</h1>
         <p className="text-gray-600">
           Tra cứu từ vựng kèm video minh họa bằng ngôn ngữ ký hiệu.
         </p>
       </div>
+
+      {/* Lịch sử tìm kiếm */}
+      {user && history.length > 0 && (
+        <div className="max-w-[600px] mx-auto mb-4 flex flex-wrap gap-2">
+          {history.map((h) => (
+            <button
+              key={h.historyID}
+              className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300 text-sm"
+              onClick={() => setSearch(h.word)}
+            >
+              {h.word}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Search box */}
       <div className="max-w-[600px] mx-auto mb-10">
@@ -41,27 +116,30 @@ const Dictionary = () => {
         {filteredWords.length > 0 ? (
           filteredWords.map((item) => (
             <div
-              key={item.id}
-              className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-4 flex flex-col items-center"
+              key={item.wordID}
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition p-4 flex flex-col items-center cursor-pointer"
+              onClick={() => setSelectedWord(item)}
             >
               <h2 className="text-xl font-semibold mb-2 text-[#00df9a]">
                 {item.word}
               </h2>
-              <p className="text-gray-700 mb-3">{item.meaning}</p>
-
-              {/* Hiển thị GIF hoặc video dựa vào đuôi file */}
-              {item.media.endsWith(".gif") ? (
+              <p className="text-gray-700 mb-3 text-center line-clamp-2">
+                {item.description}
+              </p>
+              {item.video_url?.endsWith(".gif") ? (
                 <img
-                  src={item.media}
+                  src={item.video_url}
                   alt={item.word}
                   className="w-full h-40 rounded-md object-cover"
                 />
               ) : (
                 <video
-                  src={item.media}
-                  controls
+                  src={item.video_url}
                   className="w-full h-40 rounded-md object-cover"
-                ></video>
+                  muted
+                  autoPlay
+                  loop
+                />
               )}
             </div>
           ))
@@ -71,6 +149,61 @@ const Dictionary = () => {
           </p>
         )}
       </div>
+
+      {/* Modal chi tiết */}
+      {selectedWord && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4"
+          onClick={() => setSelectedWord(null)}
+        >
+          <div
+            className="bg-white rounded-lg max-w-4xl w-full flex flex-col md:flex-row overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Hình ảnh / video */}
+            <div className="md:w-1/2 w-full">
+              {selectedWord.video_url.endsWith(".gif") ? (
+                <img
+                  src={selectedWord.video_url}
+                  alt={selectedWord.word}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <video
+                  src={selectedWord.video_url}
+                  controls
+                  autoPlay
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+
+            {/* Mô tả và nút */}
+            <div className="md:w-1/2 w-full p-6 flex flex-col justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-[#00df9a] mb-4">
+                  {selectedWord.word}
+                </h2>
+                <p className="text-gray-700">{selectedWord.description}</p>
+              </div>
+              <div className="flex flex-col mt-4">
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded mb-2"
+                  onClick={() => setSelectedWord(null)}
+                >
+                  Đóng
+                </button>
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                  onClick={() => handleReport(selectedWord.wordID)}
+                >
+                  Report
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

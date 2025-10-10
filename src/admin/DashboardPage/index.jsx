@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import UserManagement from "../../admin/DashboardPage/UserManagement.jsx";
- 
+import WordManagement from "./WordManagement";
 
 // Sidebar item component
 const SidebarItem = ({ label, onClick }) => (
@@ -79,9 +79,8 @@ export default function DashboardPage({ user, onLogout }) {
 
         {activeSection === "Users" && <UserManagement />}
 
-        {activeSection === "Words" && (
-          <p>Phần quản lý Words: có thể fetch từ API /words</p>
-        )}
+        {activeSection === "Words" && <WordManagement />}
+
 
         {activeSection === "Reports" && (
           <p>Phần quản lý Reports: có thể fetch từ API /reports</p>

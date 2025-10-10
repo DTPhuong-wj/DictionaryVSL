@@ -24,7 +24,7 @@ const Navbar = ({ user, onLogout }) => {
           <Link to="/">Home</Link>
         </li>
         <li className="p-4 hover:text-[#00df9a] transition">
-          <Link to="/course">Course</Link>
+          <Link to="/course">Report</Link>
         </li>
         <li className="p-4 hover:text-[#00df9a] transition">
           <Link to="/dictionary">Dictionary</Link>
