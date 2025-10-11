@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 import LoginPage from "./admin/LoginPage";
 import RegisterPage from "./admin/RegisterPage";
 import DashboardPage from "./admin/DashboardPage/index.jsx";
+import ReportPage from "./pages/ReportPage.jsx";
 
 // ===== User =====
 import Navbar from "./component/Navbar";
@@ -13,6 +14,7 @@ import Hero from "./component/Hero";
 import Analytics from "./component/Analytics";
 import Newsletter from "./component/Newsletter";
 import Cards from "./component/Cards";
+import History from "./component/History";
 import Dictionary from "./pages/Dictionary";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -70,14 +72,20 @@ function App() {
         <Route
           path="/"
           element={
-            <UserLayout user={user} onLogout={handleLogout}>
-              <Hero />
-              <Analytics />
-              <Newsletter />
-              <Cards />
-            </UserLayout>
+              <UserLayout user={user} onLogout={handleLogout}>
+                <Hero />
+                <Analytics />
+                <Newsletter />
+                <Cards />
+              </UserLayout>          
           }
         />
+        {/* <Route path="/history" element={<History user={currentUser} />} /> */}
+        <Route
+          path="/report"
+          element={user ? <ReportPage user={user} /> : <Navigate to="/login" />}
+        />
+
         <Route
           path="/dictionary"
           element={
@@ -100,19 +108,13 @@ function App() {
           path="/admin/dashboard"
           element={
             user && user.role === "admin" ? (
-              <DashboardPage
-                user={user}
-                onLogout={() => {
-                  localStorage.removeItem("user");
-                  localStorage.removeItem("token");
-                  setUser(null);
-                }}
-              />
+              <DashboardPage user={user} onLogout={handleLogout} />
             ) : (
               <Navigate to="/admin/login" />
             )
           }
         />
+
       </Routes>
     </Router>
   );

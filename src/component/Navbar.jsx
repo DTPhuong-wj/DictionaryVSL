@@ -24,7 +24,7 @@ const Navbar = ({ user, onLogout }) => {
           <Link to="/">Home</Link>
         </li>
         <li className="p-4 hover:text-[#00df9a] transition">
-          <Link to="/course">Report</Link>
+          <Link to="/report">Report</Link>
         </li>
         <li className="p-4 hover:text-[#00df9a] transition">
           <Link to="/dictionary">Dictionary</Link>
@@ -67,7 +67,7 @@ const Navbar = ({ user, onLogout }) => {
           <Link to="/" onClick={handleNav}>Home</Link>
         </li>
         <li className="p-4 border-b border-gray-600">
-          <Link to="/course" onClick={handleNav}>Course</Link>
+          <Link to="/report" onClick={handleNav}>Report</Link>
         </li>
         <li className="p-4 border-b border-gray-600">
           <Link to="/dictionary" onClick={handleNav}>Dictionary</Link>
